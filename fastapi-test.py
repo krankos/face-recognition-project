@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi import UploadFile, File
 
 import cv2
 import numpy
@@ -36,3 +37,14 @@ def root():
 @app.get("/video_feed")
 async def video_feed():
     return StreamingResponse(gen_frames(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+@app.post("/api/predict")
+def predict_image(file: UploadFile = File(...)):
+    image = read_imagefile(file)
+    result_image, predictions = prediction_results(image, ['Khalil', 'Others'])
+
+    return {
+        "predictions": predictions,
+        "result_image": FileResponse(path=result_image, media_type="image/jpg")
+    }
