@@ -84,7 +84,7 @@ def get_rois(faces, image):
 
 
 def load_model():
-    model = tf.keras.models.load_model('model9.h5')
+    model = tf.keras.models.load_model('model_khalil_malek2.h5')
     return model
 
 

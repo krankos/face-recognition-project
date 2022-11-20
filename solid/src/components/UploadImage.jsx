@@ -24,13 +24,10 @@ function UploadImage() {
       // send image to the server
       const formData = new FormData();
       formData.append("file", uploadedImage());
-      const response = await fetch(
-        "https://s75ozp.deta.dev/api/predict/image",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://127.0.0.1:8000/api/predict/image", {
+        method: "POST",
+        body: formData,
+      });
       // get the prediction from the server
       const data = await response;
       const contentType = response.headers.get("content-type");
@@ -38,7 +35,7 @@ function UploadImage() {
       // console.log("data.result", typeof data.result_image);
       // console.log("image: ", setImage(await data.blob()));
       // if data has a message key, then there is an error
-      if (!(contentType && contentType.indexOf("application/json") !== -1)) {
+      if (contentType && contentType.indexOf("application/json") !== -1) {
         setNoFace(true);
         setResultImage(null);
       } else {
@@ -59,7 +56,7 @@ function UploadImage() {
     try {
       const formData = new FormData();
       formData.append("file", uploadedImage());
-      const response = await fetch("https://s75ozp.deta.dev/api/predict/list", {
+      const response = await fetch("http://127.0.0.1:8000/api/predict/list", {
         method: "POST",
         body: formData,
       });
@@ -138,21 +135,20 @@ function UploadImage() {
               </ul>
             </div>
           )}
-          {predictions() ? (
-            predictions() == ["Khalil"] ? (
-              <p style={"color:magenta"}>Hello Khalil</p>
-            ) : null
-          ) : null}
         </div>
       )}
       <br />
-
+      {predictions() ? (
+        predictions().length == 1 && predictions()[0][0] == "Khalil" ? (
+          <p style={"color:magenta"}>Hello Khalil</p>
+        ) : null
+      ) : null}
       <br />
       <input
         type="file"
         name="myImage"
         id="selectedFile"
-        accept="image/jpeg, image/png, image/jpg"
+        accept="image/jpeg, image/jpg"
         // style={{ display: "none" }}
         onChange={(event) => {
           // console.log(event.target.files[0]);
