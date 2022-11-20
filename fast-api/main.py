@@ -57,7 +57,8 @@ async def video_feed():
 async def predict_image(file: UploadFile = File(...)):
 
     image = read_imagefile(file)
-    result_image = prediction_image(image, ['Khalil', 'Others'])
+    result_image = prediction_image(
+        image, ['Khalil', 'Malek', 'Others'])
     if result_image == False:
         return {"message": "No faces found"}
     else:
@@ -71,7 +72,7 @@ async def predict_image(file: UploadFile = File(...)):
 @app.post("/api/predict/list")
 async def predict_list(file: UploadFile = File(...)):
     image = read_imagefile(file)
-    predictions = prediction_list(image, ['Khalil', 'Others'])
+    predictions = prediction_list(image, ['Khalil', 'Malek', 'Others'])
     return {
         "predictions": predictions
     }

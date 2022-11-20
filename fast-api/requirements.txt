@@ -1,1 +1,4 @@
 fastapi
+opencv-python
+numpy
+tensorflow
