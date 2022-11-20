@@ -50,6 +50,7 @@ def preprocess_image(image):
     for (x, y, w, h) in faces:
         roi = image[y:y+h, x:x+w]
         roi = cv2.resize(roi, (256, 256))
+        roi = tf.keras.utils.img_to_array(roi)
         roi = np.expand_dims(roi, axis=0)
         rois.append(roi)
     return rois
@@ -66,6 +67,7 @@ def get_roi(face, image):
     x, y, w, h = face
     roi = image[y:y+h, x:x+w]
     roi = cv2.resize(roi, (256, 256))
+    roi = tf.keras.utils.img_to_array(roi)
     roi = np.expand_dims(roi, axis=0)
     return roi
 
@@ -104,38 +106,48 @@ def prediction(class_names, model, image):
 
 def draw_faces(image, model, class_names):
     faces = detect_faces(image)
-    cv2_im = image.copy()
-    for (x, y, w, h) in faces:
+    print(faces)
+    if faces == ():
+        print('No faces found')
+        return False
+    else:
+        cv2_im = image.copy()
+        for (x, y, w, h) in faces:
 
-        # cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)
-        # use plt to draw the rectangle
-        # plt.gca().add_patch(plt.Rectangle((x, y), w, h,
-        #                                   fill=False, edgecolor='red', linewidth=2))
+            # cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)
+            # use plt to draw the rectangle
+            # plt.gca().add_patch(plt.Rectangle((x, y), w, h,
+            #                                   fill=False, edgecolor='red', linewidth=2))
 
-        cv2.rectangle(cv2_im, (x, y), (x+w, y+h), (0, 255, 255), 2)
-        roi = get_roi((x, y, w, h), image)
-        name, accuracy = predict_face(model, roi, class_names)
-        # plt.text(x, y, name,
-        #          color='white', fontsize=20, backgroundcolor='red')
-        cv2.putText(cv2_im, name, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
-                    1, (255, 255, 255), 2, cv2.LINE_AA)
-        # show accuracy
-        # plt.text(x, y+h, str(accuracy)+'%',
-        #          color='white', fontsize=8, backgroundcolor='green')
-        cv2.putText(cv2_im, str(accuracy)+'%', (x, y+h), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5, (255, 255, 255), 2, cv2.LINE_AA)
+            cv2.rectangle(cv2_im, (x, y), (x+w, y+h), (0, 255, 255), 2)
+            roi = get_roi((x, y, w, h), image)
+            name, accuracy = predict_face(model, roi, class_names)
+            # plt.text(x, y, name,
+            #          color='white', fontsize=20, backgroundcolor='red')
+            cv2.putText(cv2_im, name, (x, y), cv2.FONT_HERSHEY_SIMPLEX,
+                        6, (255, 255, 255), 2, cv2.LINE_AA)
+            # show accuracy
+            # plt.text(x, y+h, str(accuracy)+'%',
+            #          color='white', fontsize=8, backgroundcolor='green')
+            cv2.putText(cv2_im, str(accuracy)+'%', (x, y+h), cv2.FONT_HERSHEY_SIMPLEX,
+                        3, (255, 255, 255), 2, cv2.LINE_AA)
 
-    # plt.axis('off')
-    # plt.savefig('predicteds.jpg', bbox_inches='tight', pad_inches=0, dpi=10)
+        # plt.axis('off')
+        # plt.savefig('predicteds.jpg', bbox_inches='tight', pad_inches=0, dpi=10)
 
-    cv2_im = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2RGB)
-    cv2.imwrite('predicteds.jpg', cv2_im)
+        cv2_im = cv2.cvtColor(cv2_im, cv2.COLOR_BGR2RGB)
+        cv2.imwrite('predicteds.jpg', cv2_im)
 
-    # read the image and return it
+        # read the image and return it
 
-    return "predicteds.jpg"
+        return "predicteds.jpg"
 
 
-def prediction_results(image, class_names):
+def prediction_image(image, class_names):
     model = load_model()
-    return draw_faces(image, model, class_names), prediction(class_names, model, image)
+    return draw_faces(image, model, class_names)
+
+
+def prediction_list(image, class_names):
+    model = load_model()
+    return prediction(class_names, model, image)
